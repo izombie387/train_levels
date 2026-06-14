@@ -1,0 +1,52 @@
+{
+  "cells": [
+    [[10, 10], "head_split"],
+    [[10, 9], "N"],
+    [[10, 8], "W"],
+    [[9, 8], "W"],
+    [[8, 8], "W"],
+    [[7, 8], "W"],
+    [[6, 8], "W"],
+    [[5, 8], "S"],
+    [[5, 9], "S"],
+    [[5, 10], "E"],
+    [[6, 10], "E"],
+    [[7, 10], "E"],
+    [[8, 10], "E"],
+    [[9, 10], "E"],
+    [[11, 10], "E"],
+    [[12, 10], "S"],
+    [[12, 11], "S"],
+    [[12, 12], "filter"],
+    [[13, 12], "S"],
+    [[13, 13], "S"],
+    [[13, 14], "accumulator"],
+    [[13, 15], "W"],
+    [[12, 15], "W"],
+    [[11, 15], "W"],
+    [[10, 15], "stop"],
+    [[11, 12], "S"],
+    [[11, 13], "S"],
+    [[11, 14], "E"],
+    [[12, 14], "E"],
+    [[14, 14], "depot"]
+  ],
+  "level": {
+    "name": "The Even Sum Filter",
+    "thoughts": "This level demonstrates the power of the head_split, filter, and accumulator cells working in tandem. By looping a train and splitting it one car at a time, we can filter even numbers into an accumulator (N->S adds to total) and park them, while using the final odd element as a trigger (W->E copies total) to send the final sum to the depot.",
+    "cell_types": ["N", "E", "S", "W", "head_split", "filter", "accumulator", "stop", "depot"],
+    "expected_solution": [20],
+    "instructions": "Design a system that sums all the even numbers in the train (2, 4, 6, 8) and outputs the final sum (20) using the odd number (99) as a trigger.",
+    "win_condition": "exact",
+    "world_bounds": [[4, 7], [16, 17]]
+  },
+  "trains": [
+    [
+      [[9, 10], 2, "E", "head"],
+      [[8, 10], 4, "E", "tail"],
+      [[7, 10], 6, "E", "tail"],
+      [[6, 10], 8, "E", "tail"],
+      [[5, 10], 99, "E", "tail"]
+    ]
+  ]
+}
