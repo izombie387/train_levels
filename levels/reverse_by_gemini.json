@@ -1,0 +1,21 @@
+{
+	"cells": [
+		[[10, 7], "E"],
+		[[9, 7], "E"],
+		[[8, 7], "E"],
+		[[11, 7], "head_split"],
+		[[11, 8], "cons"],
+		[[11, 9], "depot"]
+	],
+	"level": {
+		"cell_types": ["N", "E", "S", "W", "head_split", "cons", "depot"],
+		"expected_solution": [4, 3, 2, 1],
+		"instructions": "In an overwhelming world, sometimes you have to completely invert your perspective just to process things in the right order. Take this train and reverse it. Hint: Use a loop to keep splitting the head off, and let the 'cons' cell catch them backward.",
+		"level_name": "Inversion (Reverse a List)",
+		"thoughts": "Teaches the user how to combine head_split and cons to create an accumulator loop. The provided track layout gives them a starting straight line, but they must build the North return loop themselves using N, W, and S tiles.",
+		"win_condition": "exact",
+		"world_bounds": [[4, 2], [20, 15]]
+	},
+	"trains":
+		[[[[10, 7], 1, "E", "head"], [[9, 7], 2, "E"], [[8, 7], 3, "E"], [[7, 7], 4, "E"]]]
+}
