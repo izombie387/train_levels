@@ -1,315 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Level Exchange</title>
-<style>
-  /* ── tokens ── */
-  :root {
-    --bg: #0e0f11;
-    --surface: #16181c;
-    --border: #2a2d33;
-    --text: #e8e9eb;
-    --muted: #b9b59e;
-    --accent: #7c6af7;
-    --accent-dim: #2d2852;
-    --mono: 'Courier New', monospace;
-    --sans: system-ui, -apple-system, sans-serif;
-    --radius: 8px;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Game</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #111;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      font-family: sans-serif;
+      color: #eee;
+    }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    font-size: 15px;
-    line-height: 1.6;
-    min-height: 100vh;
-  }
+    #game-wrap {
+      position: relative;
+      width: min(100vw, 177.78vh); /* 16:9 */
+      aspect-ratio: 16 / 9;
+    }
 
-  /* ── layout ── */
-  .page { max-width: 720px; margin: 0 auto; padding: 3rem 1.25rem 5rem; }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
 
-  /* ── header ── */
-  header { margin-bottom: 2.5rem; }
-  .eyebrow {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 0.5rem;
-  }
-  h1 { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; }
-  .tagline { color: var(--muted); margin-top: 0.35rem; font-size: 14px; }
+    #fullscreen-btn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      transition: background 0.15s;
+      /* hidden until mouse is nearby */
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
 
-  /* ── toolbar ── */
-  .toolbar {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 1.5rem;
-    align-items: center;
-  }
-  .toolbar input {
-    flex: 1;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-family: var(--sans);
-    font-size: 14px;
-    padding: 8px 12px;
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  .toolbar input:focus { border-color: var(--accent); }
-  .toolbar input::placeholder { color: var(--muted); }
-  .refresh-btn {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 18px;
-    line-height: 1;
-    padding: 7px 11px;
-    transition: color 0.15s, border-color 0.15s;
-  }
-  .refresh-btn:hover { color: var(--text); border-color: var(--accent); }
+    #game-wrap:hover #fullscreen-btn { opacity: 1; }
 
-  /* ── status bar ── */
-  .status {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 1rem;
-    min-height: 18px;
-  }
-  .status.error { color: #f87171; }
-
-  /* ── level grid ── */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 10px;
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    transition: border-color 0.15s;
-  }
-  .card:hover { border-color: var(--accent); }
-
-  .card-name {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-    word-break: break-word;
-  }
-  .card-meta {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-  }
-
-  .copy-btn {
-    margin-top: auto;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--muted);
-    cursor: pointer;
-    font-family: var(--mono);
-    font-size: 12px;
-    padding: 6px 10px;
-    text-align: left;
-    transition: all 0.15s;
-    width: 100%;
-  }
-  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .copy-btn.copied { border-color: #4ade80; color: #4ade80; }
-
-  /* ── empty / skeleton ── */
-  .empty {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 3rem 1rem;
-    color: var(--muted);
-    font-size: 14px;
-    border: 1px dashed var(--border);
-    border-radius: var(--radius);
-  }
-
-  .skeleton {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .skel-line {
-    background: var(--border);
-    border-radius: 4px;
-    height: 12px;
-    animation: pulse 1.4s ease-in-out infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:.9} }
-
-  /* ── footer ── */
-  footer {
-    margin-top: 3.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  footer p { font-size: 13px; color: var(--muted); }
-  .submit-link {
-    background: var(--accent-dim);
-    border: 1px solid var(--accent);
-    border-radius: var(--radius);
-    color: var(--accent);
-    font-size: 13px;
-    font-weight: 500;
-    padding: 8px 16px;
-    text-decoration: none;
-    transition: background 0.15s;
-  }
-  .submit-link:hover { background: var(--accent); color: #fff; }
-
-  @media (max-width: 480px) {
-    h1 { font-size: 22px; }
-    .grid { grid-template-columns: 1fr; }
-  }
-</style>
+    #fullscreen-btn:hover { background: rgba(0,0,0,0.8); }
+  </style>
 </head>
 <body>
-<div class="page">
-  
-  <section class="game-section">
-    <h2>Play</h2>
-    <iframe src="game/index.html" width="480" height="270" allowfullscreen></iframe>
-  </section>
+  <div id="game-wrap">
+    <!--
+      Point src at your Godot export's index.html inside the /game/ subfolder.
+      allow="fullscreen" is required for the Fullscreen API to work inside an iframe.
+    -->
+    <iframe
+      id="game-frame"
+      src="game/index.html"
+      allow="fullscreen"
+      allowfullscreen
+    ></iframe>
 
-  <header>
-    <p class="eyebrow">community levels</p>
-    <h1>Level Exchange</h1>
-    <p class="tagline">Download levels made by other players. Copy the JSON, then paste it into the game.</p>
-  </header>
-
-  
-  <div class="toolbar">
-    <input type="search" id="search" placeholder="Filter levels…" oninput="render()" aria-label="Filter levels">
-    <button class="refresh-btn" onclick="load()" title="Refresh" aria-label="Refresh levels">↻</button>
+    <button id="fullscreen-btn" title="Fullscreen">⛶</button>
   </div>
 
-  <p class="status" id="status" aria-live="polite"></p>
+  <script>
+    const btn = document.getElementById('fullscreen-btn');
+    const wrap = document.getElementById('game-wrap');
 
-  <div class="grid" id="grid"></div>
+    btn.addEventListener('click', () => {
+      // Try to fullscreen the wrapper div; falls back to the iframe itself.
+      const el = wrap.requestFullscreen ? wrap : document.getElementById('game-frame');
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        el.requestFullscreen().catch(err => {
+          console.warn('Fullscreen request failed:', err);
+        });
+      }
+    });
 
-  <footer>
-    <p>Made a level you want to share?</p>
-    <a class="submit-link" href="https://forms.gle/DMectZKqW7JGeuPN7" target="_blank" rel="noopener">Submit a level →</a>
-  </footer>
-
-</div>
-<script>
-  const OWNER  = 'izombie387';
-  const REPO   = 'train_levels';
-  const FOLDER = 'levels';
-  const API    = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FOLDER}`;
-
-  let all = [];
-
-  async function load() {
-    setStatus('loading');
-    showSkeletons();
-    try {
-      const res = await fetch(API, { headers: { Accept: 'application/vnd.github+json' } });
-      if (!res.ok) throw new Error(`GitHub API returned ${res.status}`);
-      const files = await res.json();
-      all = files.filter(f => f.name.endsWith('.json'));
-      setStatus('ok', all.length);
-      render();
-    } catch (e) {
-      setStatus('error', e.message);
-      document.getElementById('grid').innerHTML =
-        '<div class="empty">Couldn\'t load levels — check the repo settings or try refreshing.</div>';
-    }
-  }
-
-  function render() {
-    const q = document.getElementById('search').value.toLowerCase();
-    const filtered = q ? all.filter(f => f.name.toLowerCase().includes(q)) : all;
-    const grid = document.getElementById('grid');
-    if (!filtered.length) {
-      grid.innerHTML = '<div class="empty">No levels match that filter.</div>';
-      return;
-    }
-    grid.innerHTML = filtered.map(f => {
-      const name = f.name.replace(/\.json$/i, '').replace(/[-_]/g, ' ');
-      const size = f.size < 1024 ? `${f.size} B` : `${(f.size/1024).toFixed(1)} KB`;
-      return `
-        <div class="card">
-          <p class="card-name">${escHtml(name)}</p>
-          <p class="card-meta">${escHtml(f.name)} · ${size}</p>
-          <button class="copy-btn" onclick="copyLevel(this,'${escAttr(f.download_url)}','${escAttr(f.name)}')">
-            copy JSON to clipboard
-          </button>
-        </div>`;
-    }).join('');
-  }
-
-  async function copyLevel(btn, url, filename) {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('fetch failed');
-      const text = await res.text();
-      await navigator.clipboard.writeText(text);
-      btn.textContent = '✓ copied!';
-      btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = 'copy JSON to clipboard'; btn.classList.remove('copied'); }, 2000);
-    } catch {
-      btn.textContent = 'open raw ↗';
-      btn.onclick = () => window.open(url, '_blank');
-    }
-  }
-
-  function showSkeletons() {
-    document.getElementById('grid').innerHTML = Array(6).fill(`
-      <div class="skeleton">
-        <div class="skel-line" style="width:70%"></div>
-        <div class="skel-line" style="width:45%"></div>
-        <div class="skel-line" style="width:90%;height:28px;margin-top:4px"></div>
-      </div>`).join('');
-  }
-
-  function setStatus(state, data) {
-    const el = document.getElementById('status');
-    el.className = 'status';
-    if (state === 'loading') { el.textContent = 'fetching levels…'; }
-    else if (state === 'ok')  { el.textContent = `${data} level${data===1?'':'s'} available`; }
-    else { el.className = 'status error'; el.textContent = `error: ${data}`; }
-  }
-
-  function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function escAttr(s) { return s.replace(/'/g,'&#39;'); }
-
-  load();
-</script>
+    // Update button icon to reflect fullscreen state
+    document.addEventListener('fullscreenchange', () => {
+      btn.textContent = document.fullscreenElement ? '✕' : '⛶';
+    });
+  </script>
 </body>
 </html>
