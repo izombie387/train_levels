@@ -1,95 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Game</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<style>
+body {
+  background-color: darkblue;
+}
 
-    body {
-      background: #111;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100dvh;
-      font-family: sans-serif;
-      color: #eee;
-    }
+h1 {
+  color: gray;
+  text-align: center;
+}
 
-    #game-wrap {
-      position: relative;
-      width: min(100vw, 177.78vh); /* 16:9 */
-      aspect-ratio: 16 / 9;
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-    }
-
-    #fullscreen-btn {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.55);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: #fff;
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 18px;
-      line-height: 1;
-      transition: background 0.15s;
-      /* hidden until mouse is nearby */
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    #game-wrap:hover #fullscreen-btn { opacity: 1; }
-
-    #fullscreen-btn:hover { background: rgba(0,0,0,0.8); }
-  </style>
+p {
+  color: gray;
+  font-family: verdana;
+  font-size: 20px;
+}
+a {
+  color: lightblue;
+}
+</style>
 </head>
 <body>
-  <div id="game-wrap">
-    <!--
-      Point src at your Godot export's index.html inside the /game/ subfolder.
-      allow="fullscreen" is required for the Fullscreen API to work inside an iframe.
-    -->
-    <iframe
-      id="game-frame"
-      src="game/index.html"
-      allow="fullscreen"
-      allowfullscreen
-    ></iframe>
 
-    <button id="fullscreen-btn" title="Fullscreen">⛶</button>
-  </div>
+<h1>Listless by izombie387</h1>
+<p>Please visit<br>
+<a href="izombie387.itch.io/listless">izombie387.itch.io/listless</a><br>
+for the latest version of the game.</p>
 
-  <script>
-    const btn = document.getElementById('fullscreen-btn');
-    const wrap = document.getElementById('game-wrap');
-
-    btn.addEventListener('click', () => {
-      // Try to fullscreen the wrapper div; falls back to the iframe itself.
-      const el = wrap.requestFullscreen ? wrap : document.getElementById('game-frame');
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      } else {
-        el.requestFullscreen().catch(err => {
-          console.warn('Fullscreen request failed:', err);
-        });
-      }
-    });
-
-    // Update button icon to reflect fullscreen state
-    document.addEventListener('fullscreenchange', () => {
-      btn.textContent = document.fullscreenElement ? '✕' : '⛶';
-    });
-  </script>
 </body>
 </html>
